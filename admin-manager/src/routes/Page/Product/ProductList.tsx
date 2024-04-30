@@ -206,7 +206,7 @@ const ProductList = () => {
       method: "GET",
       url: `/product${query ? `?productName=${query}` : ""}`,
       headers: {
-        Authorization: `Berear ${user?.accessToken}`,
+        Authorization: `Bearer ${user?.accessToken}`,
       },
     });
     if (res.data.length > 0) {
@@ -224,7 +224,7 @@ const ProductList = () => {
         method: "GET",
         url: `/product?page=${page}&offset=10`,
         headers: {
-          Authorization: `Berear ${user?.accessToken}`,
+          Authorization: `Bearer ${user?.accessToken}`,
         },
       })
         .then((response) => {
@@ -238,23 +238,6 @@ const ProductList = () => {
     })();
   }, [page]);
 
-  useEffect(() => {
-    (async () => {
-      await AxiosJWTInstance({ user, dispath })({
-        method: "GET",
-        url: `/product?page=1&offset=10`,
-        headers: {
-          Authorization: `Berear ${user?.accessToken}`,
-        },
-      })
-        .then((response) => {
-          setSearchResults(response.data);
-        })
-        .catch((error) => {
-          toast.error(error.message);
-        });
-    })();
-  }, []);
   return (
     <>
       <Helmet title="Product-list">

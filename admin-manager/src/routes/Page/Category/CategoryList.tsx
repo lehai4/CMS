@@ -136,7 +136,7 @@ const CategoryList = () => {
         method: "GET",
         url: `/category?page=${page}&offset=10`,
         headers: {
-          Authorization: `Berear ${user?.accessToken}`,
+          Authorization: `Bearer ${user?.accessToken}`,
         },
       })
         .then((response) => {
