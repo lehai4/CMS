@@ -37,7 +37,26 @@ export async function getAllCategory() {
     console.log(err);
   }
 }
-
+export async function getAllPurchase({
+  user,
+  dispath,
+}: {
+  user: any;
+  dispath: any;
+}) {
+  try {
+    const res = await AxiosJWTInstance({ user, dispath })("/purchase/admin", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.accessToken}`,
+      },
+    });
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+}
 export async function getProductByName({ name }: { name: string }) {
   return await axios(`/product/${name}`, {
     method: "GET",
@@ -51,6 +70,23 @@ export async function getCategoryByName({ name }: { name: string }) {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+    },
+  }).then((data) => data);
+}
+export async function getPurchaseById({
+  id,
+  user,
+  dispath,
+}: {
+  id: string;
+  user: any;
+  dispath: any;
+}) {
+  return await AxiosJWTInstance({ user, dispath })(`/purchase/${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${user?.accessToken}`,
     },
   }).then((data) => data);
 }

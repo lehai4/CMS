@@ -3,6 +3,7 @@ import {
   MergeCellsOutlined,
   ProductOutlined,
   ReadOutlined,
+  AppstoreAddOutlined,
 } from "@ant-design/icons";
 
 export const routerAdmin = [
@@ -23,6 +24,12 @@ export const routerAdmin = [
     path: "/category",
     content: "Category",
     icon: <MergeCellsOutlined />,
+  },
+  {
+    id: 3,
+    path: "/purchase",
+    content: "Purchase",
+    icon: <AppstoreAddOutlined />,
   },
 ];
 export const routerUser = [

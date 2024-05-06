@@ -19,3 +19,6 @@ export { default as ProductDetail } from "./Page/Product/ProductDetail/index";
 export { default as ProductDetailSlug } from "./Page/Product/ProductDetail/ProductDetailSlug";
 export { default as Profile } from "./Page/Profile";
 export { default as UpdateProfile } from "./Page/Profile/UpdateProfile";
+
+export { default as PurChase } from "./Page/Purchase";
+export { default as ReviewPurchase } from "./Page/Purchase/ReviewPurchase";

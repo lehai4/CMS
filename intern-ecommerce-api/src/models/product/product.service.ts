@@ -96,11 +96,19 @@ export class ProductService {
     if (updateProductDto.name) {
       return this.updateProductAndUrlName(id, updateProductDto);
     }
-
-    return this.prisma.product.update({
+    const override = {
+      name: updateProductDto.name,
+      basePrice: updateProductDto.basePrice,
+      discountPercentage: updateProductDto.discountPercentage,
+      stock: updateProductDto.stock,
+      description: updateProductDto.description,
+    };
+    const product = await this.prisma.product.update({
       where: { id },
-      data: { ...updateProductDto },
+      data: override,
     });
+
+    return product;
   }
 
   /** Removes product from database */
@@ -134,10 +142,18 @@ export class ProductService {
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
     const urlName = this.formatUrlName(updateProductDto.name);
+    const override = {
+      name: updateProductDto.name,
+      basePrice: updateProductDto.basePrice,
+      discountPercentage: updateProductDto.discountPercentage,
+      stock: updateProductDto.stock,
+      description: updateProductDto.description,
+      urlName: urlName,
+    };
 
     return this.prisma.product.update({
       where: { id },
-      data: { ...updateProductDto, urlName },
+      data: override,
     });
   }
 

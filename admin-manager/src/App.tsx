@@ -23,7 +23,9 @@ import {
   ProductDetailSlug,
   ProductList,
   Profile,
+  PurChase,
   Register,
+  ReviewPurchase,
   RootDefault,
   UpdateProfile,
 } from "./routes/importRoot";
@@ -79,6 +81,16 @@ function App() {
         {
           path: "/profile/update",
           element: <UpdateProfile />,
+          errorElement: <ErrorPage />,
+        },
+        {
+          path: "/purchase",
+          element: <PurChase />,
+          errorElement: <ErrorPage />,
+        },
+        {
+          path: "/purchase/:id",
+          element: <ReviewPurchase />,
           errorElement: <ErrorPage />,
         },
       ],

@@ -1,4 +1,5 @@
 import { SiderTheme } from "antd/es/layout/Sider";
+import React from "react";
 
 export interface ThemeContextProp {
   themeContext: SiderTheme;
@@ -15,6 +16,7 @@ export interface ProductProps {
   stock: number;
   categories: Category[];
   description: string;
+  quantity?: number;
 }
 export type ProductSliceProps = {
   productArr: ProductProps[];
@@ -95,4 +97,39 @@ export interface PropLogOut {
 export interface Token {
   accessToken: string;
   refreshToken: string;
+}
+//
+
+export interface DataTypePurchase {
+  key: React.key;
+  id: string;
+  userId: string;
+  productId: string;
+  amount: number;
+  totalPrice: string;
+  reviewNote: string | null;
+  reviewComment: string | null;
+  createdAt: string;
+  user: {
+    email: string;
+  };
+  product: {
+    name: string;
+  };
+}
+export interface Purchase {
+  id: string;
+  userId: string;
+  productId: string;
+  amount: number;
+  totalPrice: string;
+  reviewNote: string | null;
+  reviewComment: string | null;
+  createdAt: string;
+  user: {
+    email: string;
+  };
+  product: {
+    name: string;
+  };
 }

@@ -1,12 +1,11 @@
 import { Table, TableColumnsType } from "antd";
-import { DataType } from "../../type";
 
 const TableList = ({
   dataSource,
   columns,
 }: {
-  dataSource: DataType[];
-  columns: TableColumnsType<DataType>;
+  dataSource: any[];
+  columns: TableColumnsType<any>;
 }) => {
   return (
     <Table

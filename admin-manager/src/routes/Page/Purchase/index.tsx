@@ -3,9 +3,9 @@ import Helmet from "@/components/Helmet";
 import InfiniteScroll from "@/components/InfiniteScroller";
 import TableList from "@/components/TableList";
 import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
-import { getAllCategory } from "@/redux/api";
-import { Category, DataTypeCategory } from "@/type";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { getAllPurchase } from "@/redux/api";
+import { DataTypePurchase } from "@/type";
+import { DeleteOutlined, EnvironmentOutlined } from "@ant-design/icons";
 import {
   Button,
   Input,
@@ -21,32 +21,32 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDebouncedCallback } from "use-debounce";
 
-const CategoryList = () => {
+const PurChase = () => {
   const dispath = useAppDispatch();
   const user = useAppSelector((state) => state.auth.login.currentUser);
 
   const [query, setQuery] = useState<string>("");
   const [page, setPage] = useState(1);
-  const [idDelete, setIdDelete] = useState<string>("");
 
-  const [searchResults, setSearchResults] = useState<Category[]>([]);
+  const [idDelete, setIdDelete] = useState<string>("");
+  const [purchase, setPurchase] = useState<DataTypePurchase[]>([]);
   const [isHasMore, setIsHasMore] = useState<boolean>(true);
 
   const confirm: PopconfirmProps["onConfirm"] = async () => {
     try {
       await AxiosJWTInstance({ user, dispath })({
         method: "DELETE",
-        url: `/category/${idDelete}`,
+        url: `/purchase/${idDelete}`,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user?.accessToken}`,
         },
       });
-      const category = await getAllCategory();
-      setSearchResults(category);
-      toast.success("Delete successfully!");
+      const purchase = await getAllPurchase({ user, dispath });
+      setPurchase(purchase);
+      toast.success("Delete purchase successfully!");
     } catch (e) {
-      toast.error("Delete Failed!");
+      toast.error("Delete purchase failed!");
     }
   };
 
@@ -54,7 +54,7 @@ const CategoryList = () => {
     message.error("No Delete");
   };
 
-  const columns: TableColumnsType<DataTypeCategory> = [
+  const columns: TableColumnsType<DataTypePurchase> = [
     {
       title: "Id",
       dataIndex: "id",
@@ -63,27 +63,89 @@ const CategoryList = () => {
       ),
     },
     {
-      title: "Name",
-      dataIndex: "name",
-      render: (name: string) => (
-        <Typography.Text className="text-[16px]">{name}</Typography.Text>
+      title: "UserId",
+      dataIndex: "userId",
+      render: (userId: string) => (
+        <Typography.Text className="text-[16px]">{userId}</Typography.Text>
       ),
     },
-
+    {
+      title: "ProductId",
+      dataIndex: "productId",
+      render: (productId: string) => (
+        <Typography.Text className="text-[16px]">{productId}</Typography.Text>
+      ),
+    },
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      render: (amount: string) => (
+        <Typography.Text className="text-[16px]">{amount}</Typography.Text>
+      ),
+    },
+    {
+      title: "TotalPrice",
+      dataIndex: "totalPrice",
+      render: (totalPrice: string) => (
+        <Typography.Text className="text-[16px]">{totalPrice}</Typography.Text>
+      ),
+    },
+    {
+      title: "ReviewNote",
+      dataIndex: "reviewNote",
+      render: (reviewNote: string) => (
+        <Typography.Text className="text-[16px]">
+          {reviewNote !== null ? reviewNote : "No review"}
+        </Typography.Text>
+      ),
+    },
+    {
+      title: "ReviewComment",
+      dataIndex: "reviewComment",
+      render: (reviewComment: string) => (
+        <Typography.Text className="text-[16px]">
+          {reviewComment !== null ? reviewComment : "No Comment"}
+        </Typography.Text>
+      ),
+    },
+    {
+      title: "Date Create",
+      dataIndex: "createdAt",
+      render: (createdAt: string) => (
+        <Typography.Text className="text-[16px]">{createdAt}</Typography.Text>
+      ),
+    },
+    {
+      title: "User",
+      dataIndex: "user",
+      render: (user: { email: string }) => (
+        <Typography.Text className="text-[16px]">{user.email}</Typography.Text>
+      ),
+    },
+    {
+      title: "Product",
+      dataIndex: "product",
+      render: (product: { name: string }) => (
+        <Typography.Text className="text-[16px]">
+          {product.name}
+        </Typography.Text>
+      ),
+    },
     {
       title: "Action",
       dataIndex: "",
       key: "x",
-      render: (e: DataTypeCategory) => (
+      fixed: "right",
+      render: (e: DataTypePurchase) => (
         <Space className="gap-4">
-          <Link to={`/category/edit/${e.name}`}>
-            <Button type="primary" icon={<EditOutlined />} size="large">
-              Edit
+          <Link to={`/purchase/${e.id}`}>
+            <Button type="primary" icon={<EnvironmentOutlined />} size="large">
+              Review
             </Button>
           </Link>
           <Popconfirm
             title="Delete"
-            description={`You are sure delete "${e.name}" ?`}
+            description={`You are sure delete "${e.id}" ?`}
             onConfirm={confirm}
             onCancel={cancel}
             okText="Yes"
@@ -103,38 +165,30 @@ const CategoryList = () => {
     },
   ];
 
-  const dataSource: any[] = searchResults?.map((t) => {
+  const dataSource: any[] = purchase?.map((t) => {
     return {
       key: t.id,
       id: t.id,
-      name: t.name,
+      userId: t.userId,
+      productId: t.productId,
+      amount: t.amount,
+      totalPrice: t.totalPrice,
+      reviewNote: t.reviewNote,
+      reviewComment: t.reviewComment,
+      createdAt: t.createdAt,
+      user: t.user,
+      product: t.product,
     };
   });
-
   const handleChangeInputSearch = useDebouncedCallback(async () => {
-    const res = await AxiosJWTInstance({ user, dispath })({
-      method: "GET",
-      url: `/category${query ? `?categoryName=${query}` : ""}`,
-      headers: {
-        Authorization: `Berear ${user?.accessToken}`,
-      },
-    });
-    if (res.data.length > 0) {
-      Array.isArray(res.data)
-        ? setSearchResults([...res.data])
-        : setSearchResults([{ id: res.data.id, name: res.data.name }]);
-      toast.success("Search category is found");
-    } else {
-      setSearchResults([]);
-      toast.info("No results found!");
-    }
+    toast.info("function is not working");
   }, 1000);
 
   useEffect(() => {
     (async () => {
       await AxiosJWTInstance({ user, dispath })({
         method: "GET",
-        url: `/category?page=${page}&offset=10`,
+        url: `/purchase/admin?page=${page}&offset=10`,
         headers: {
           Authorization: `Bearer ${user?.accessToken}`,
         },
@@ -142,7 +196,7 @@ const CategoryList = () => {
         .then((response) => {
           response.data.length === 0
             ? setIsHasMore(false)
-            : setSearchResults([...searchResults, ...response.data]);
+            : setPurchase([...purchase, ...response.data]);
         })
         .catch((error) => {
           toast.error(error.message);
@@ -156,16 +210,16 @@ const CategoryList = () => {
         <></>
       </Helmet>
       <div className="py-[20px] px-[30px]">
-        <h1 className="text-[32px] font-semibold">Category List</h1>
+        <h1 className="text-[32px] font-semibold">Purchase List</h1>
         <Space direction="horizontal" className="py-[20px] flex flex-row gap-5">
           <Space className="gap-5">
-            <form method="get" action="/category">
+            <form method="get" action="/purchase">
               <Input.Search
                 className="flex py-[20px]"
-                placeholder="Search category..."
+                placeholder="Search purchase..."
                 size="large"
                 type="search"
-                name="categoryName"
+                name="purchaseName"
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
@@ -176,7 +230,7 @@ const CategoryList = () => {
             </form>
             <Link to="create">
               <Button type="primary" className="bg-blue-500" size="large">
-                Create Category
+                Create Purchase
               </Button>
             </Link>
           </Space>
@@ -196,4 +250,4 @@ const CategoryList = () => {
   );
 };
 
-export default CategoryList;
+export default PurChase;
