@@ -1,6 +1,6 @@
 import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
-import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
+import { useAppSelector } from "@/hook/useHookRedux";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Space } from "antd";
 import { useEffect, useState } from "react";
@@ -14,10 +14,11 @@ interface FieldType {
 }
 const Profile = () => {
   const [form] = Form.useForm();
-  const dispath = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.login.currentUser);
   const role: any = user?.user?.role;
+
+  const axiosAuth = AxiosJWTInstance({ user });
   const [profile, setProfile] = useState<FieldType>();
 
   const onFill = () => {
@@ -34,7 +35,7 @@ const Profile = () => {
 
   useEffect(() => {
     (async function getProfileUser() {
-      await AxiosJWTInstance({ user, dispath })({
+      await axiosAuth({
         method: "GET",
         url: "/user",
         headers: {

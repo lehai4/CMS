@@ -14,16 +14,30 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useAppDispatch } from "@/hook/useHookRedux";
+import { AddToCart } from "@/redux/slice/cartSlice";
 
 const ProductDetailSlug = () => {
   const params = useParams();
   const navigate = useNavigate();
+  const dispath = useAppDispatch();
   const [product, setProduct] = useState<ProductProps>();
-
+  const [quantity, setQuantity] = useState<number>(1);
   const handleReview = () => {
     toast.info("Thanks you because seen product!");
   };
 
+  const onChange = (value: number | null) => {
+    setQuantity(value as number);
+  };
+  const handleAddToCart = () => {
+    dispath(
+      AddToCart({
+        ...product,
+        quantity: quantity,
+      })
+    );
+  };
   useEffect(() => {
     let mounted = true;
     getProductByName({ name: params.name as string }).then((items) => {
@@ -130,17 +144,25 @@ const ProductDetailSlug = () => {
                   width="250"
                   min={1}
                   max={10}
-                  defaultValue={1}
-                  onChange={() => {}}
+                  value={quantity}
+                  onChange={onChange}
                 />
               </Space>
               <Divider />
-              <button
-                className="rounded-full border border-blue-500 text-base px-[25px] md:px-[30px] lg:px-[42px] py-[8px] md:py-[12px] lg:py-[12px] bg-blue-500 text-white hover:text-blue-500 hover:bg-white duration-300 ease-in"
-                onClick={handleReview}
-              >
-                Review
-              </button>
+              <div className="flex flex-col gap-5">
+                <button
+                  className="rounded-full border border-black-500 text-base px-[25px] md:px-[30px] lg:px-[42px] py-[8px] md:py-[12px] lg:py-[12px] bg-white text-black hover:text-blue-500 hover:border-blue-500 hover:bg-white duration-300 ease-in"
+                  onClick={handleAddToCart}
+                >
+                  Add To Cart
+                </button>
+                <button
+                  className="rounded-full border border-blue-500 text-base px-[25px] md:px-[30px] lg:px-[42px] py-[8px] md:py-[12px] lg:py-[12px] bg-blue-500 text-white hover:text-blue-500 hover:bg-white duration-300 ease-in"
+                  onClick={handleReview}
+                >
+                  Review
+                </button>
+              </div>
             </div>
           </div>
         </div>

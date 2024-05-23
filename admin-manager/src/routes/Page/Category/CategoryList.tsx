@@ -2,7 +2,7 @@ import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
 import InfiniteScroll from "@/components/InfiniteScroller";
 import TableList from "@/components/TableList";
-import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
+import { useAppSelector } from "@/hook/useHookRedux";
 import { getAllCategory } from "@/redux/api";
 import { Category, DataTypeCategory } from "@/type";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
@@ -22,9 +22,9 @@ import { toast } from "react-toastify";
 import { useDebouncedCallback } from "use-debounce";
 
 const CategoryList = () => {
-  const dispath = useAppDispatch();
   const user = useAppSelector((state) => state.auth.login.currentUser);
 
+  const axiosAuth = AxiosJWTInstance({ user });
   const [query, setQuery] = useState<string>("");
   const [page, setPage] = useState(1);
   const [idDelete, setIdDelete] = useState<string>("");
@@ -34,7 +34,7 @@ const CategoryList = () => {
 
   const confirm: PopconfirmProps["onConfirm"] = async () => {
     try {
-      await AxiosJWTInstance({ user, dispath })({
+      await axiosAuth({
         method: "DELETE",
         url: `/category/${idDelete}`,
         headers: {
@@ -112,7 +112,7 @@ const CategoryList = () => {
   });
 
   const handleChangeInputSearch = useDebouncedCallback(async () => {
-    const res = await AxiosJWTInstance({ user, dispath })({
+    const res = await axiosAuth({
       method: "GET",
       url: `/category${query ? `?categoryName=${query}` : ""}`,
       headers: {
@@ -132,7 +132,7 @@ const CategoryList = () => {
 
   useEffect(() => {
     (async () => {
-      await AxiosJWTInstance({ user, dispath })({
+      await axiosAuth({
         method: "GET",
         url: `/category?page=${page}&offset=10`,
         headers: {

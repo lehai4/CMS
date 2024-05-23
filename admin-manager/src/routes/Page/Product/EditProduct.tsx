@@ -1,6 +1,6 @@
 import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
-import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
+import { useAppSelector } from "@/hook/useHookRedux";
 import { getProductByName } from "@/redux/api";
 import { ProductProps } from "@/type";
 import { ArrowLeftOutlined } from "@ant-design/icons";
@@ -15,16 +15,15 @@ type FieldType = {
   basePrice?: string;
   stock?: string;
   discountPercentage?: string;
-  // categories?: any;
 };
 
 const EditProduct = () => {
   const params = useParams();
   const [form] = Form.useForm();
-  const dispath = useAppDispatch();
   const navigate = useNavigate();
   const [product, setProduct] = useState<ProductProps>();
   const user = useAppSelector((state) => state.auth.login.currentUser);
+  const axiosAuth = AxiosJWTInstance({ user });
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     const formData = {
@@ -33,7 +32,7 @@ const EditProduct = () => {
       stock: Number(values.stock),
       discountPercentage: Number(values.discountPercentage),
     };
-    const res = await AxiosJWTInstance({ user, dispath })({
+    const res = await axiosAuth({
       method: "PATCH",
       url: `/product/${product?.id}`,
       headers: {

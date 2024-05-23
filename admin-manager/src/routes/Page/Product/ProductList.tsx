@@ -2,7 +2,7 @@ import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
 import InfiniteScroll from "@/components/InfiniteScroller";
 import TableList from "@/components/TableList";
-import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
+import { useAppSelector } from "@/hook/useHookRedux";
 import { getProduct } from "@/redux/api";
 import { DataType, ProductProps } from "@/type";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
@@ -23,8 +23,9 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDebouncedCallback } from "use-debounce";
 const ProductList = () => {
-  const dispath = useAppDispatch();
   const user = useAppSelector((state) => state.auth.login.currentUser);
+  console.log(user);
+  const axiosAuth = AxiosJWTInstance({ user });
 
   const [query, setQuery] = useState<string>("");
   const [file, setFile] = useState<any>();
@@ -39,7 +40,7 @@ const ProductList = () => {
 
   const confirm: PopconfirmProps["onConfirm"] = async () => {
     try {
-      await AxiosJWTInstance({ user, dispath })({
+      await axiosAuth({
         method: "DELETE",
         url: `/product/${idDelete}`,
         headers: {
@@ -170,7 +171,7 @@ const ProductList = () => {
   const onUpload = async () => {
     const formData = new FormData();
     formData.append("file", file);
-    await AxiosJWTInstance({ user, dispath })({
+    await axiosAuth({
       url: `/product/picture/${id}`,
       method: "PATCH",
       headers: {
@@ -182,7 +183,7 @@ const ProductList = () => {
         setModalOpen(false);
         setFileReview("");
         toast.success("Change image successfully");
-        await AxiosJWTInstance({ user, dispath })({
+        await axiosAuth({
           method: "GET",
           url: `/product`,
           headers: {
@@ -202,7 +203,7 @@ const ProductList = () => {
   };
 
   const handleChangeInputSearch = useDebouncedCallback(async () => {
-    const res = await AxiosJWTInstance({ user, dispath })({
+    const res = await axiosAuth({
       method: "GET",
       url: `/product${query ? `?productName=${query}` : ""}`,
       headers: {
@@ -220,7 +221,7 @@ const ProductList = () => {
 
   useEffect(() => {
     (async () => {
-      await AxiosJWTInstance({ user, dispath })({
+      await axiosAuth({
         method: "GET",
         url: `/product?page=${page}&offset=10`,
         headers: {

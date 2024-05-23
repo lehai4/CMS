@@ -1,52 +1,54 @@
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-import { Token } from "../type";
-import { signInSuccess } from "../redux/slice/authSlice";
+import { useEffect } from "react";
+import { axiosAuth } from "@/lib/axios";
+import { useAppDispatch } from "@/hook/useHookRedux";
+import { signInSuccess } from "@/redux/slice/authSlice";
+import { useRefreshToken } from "@/hook/useRefreshToken";
 
-export const refreshToken = async ({ refreshToken }: { refreshToken: any }) => {
-  try {
-    const res = await axios({
-      method: "POST",
-      url: "/refresh",
-      data: { refreshToken },
-    });
-    return res.data;
-  } catch (e) {
-    console.log("Refresh not match!. Please seen refreshToken");
-  }
-};
-export const AxiosJWTInstance = ({
-  user,
-  dispath,
-}: {
-  user: any;
-  dispath: any;
-}) => {
-  const axiosJWT = axios.create();
-  axiosJWT.interceptors.request.use(
-    async (config) => {
-      let date = new Date();
-      const decodeJWT: any = jwtDecode(user?.accessToken as string);
-      if (decodeJWT.exp < date.getTime() / 1000) {
-        const data: Token = await refreshToken({
-          refreshToken: user?.refreshToken as string,
-        });
-        const refreshUser = {
-          ...user,
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken,
-        };
-        dispath(signInSuccess(refreshUser));
+export const AxiosJWTInstance = ({ user }: { user: any }) => {
+  const dispatch = useAppDispatch();
+  const refreshToken = useRefreshToken({ user });
+  useEffect(() => {
+    const requestIntercept = axiosAuth.interceptors.request.use(
+      (config) => {
+        if (!config.headers["Authorization"]) {
+          config.headers["Authorization"] = `Bearer ${user?.accessToken}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
 
-        config.headers["Authorization"] = "Bearer " + data.accessToken;
+    const responseIntercept = axiosAuth.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      async (error) => {
+        const prevRequest = error?.config;
+        if (error?.response?.status === 401 && !prevRequest?.sent) {
+          prevRequest.sent = true;
+
+          const res = await refreshToken();
+          const newUserRefreshToken = {
+            ...user,
+            accessToken: res.accessToken,
+            refreshToken: res.refreshToken,
+          };
+          dispatch(signInSuccess(newUserRefreshToken));
+
+          prevRequest.headers["Authorization"] = `Bearer ${res.accessToken}`;
+          return axiosAuth(prevRequest);
+        }
+        return Promise.reject(error);
       }
-      return config;
-    },
-    (e) => {
-      return Promise.reject(e);
-    }
-  );
-  return axiosJWT;
+    );
+
+    return () => {
+      axiosAuth.interceptors.request.eject(requestIntercept);
+      axiosAuth.interceptors.response.eject(responseIntercept);
+    };
+  }, [user]);
+
+  return axiosAuth;
 };
 
 export default AxiosJWTInstance;

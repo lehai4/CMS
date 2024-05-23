@@ -1,5 +1,4 @@
 import { SiderTheme } from "antd/es/layout/Sider";
-import axios from "axios";
 import { useState } from "react";
 import {
   Navigate,
@@ -31,7 +30,6 @@ import {
 } from "./routes/importRoot";
 
 function App() {
-  axios.defaults.baseURL = "http://localhost:8070";
   const [themeContext, setTheme] = useState<SiderTheme>("light");
   const user = useAppSelector((state) => state.auth.login.currentUser);
   const role: any = user?.user?.role;

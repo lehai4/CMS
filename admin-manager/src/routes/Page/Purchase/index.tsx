@@ -2,7 +2,7 @@ import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
 import InfiniteScroll from "@/components/InfiniteScroller";
 import TableList from "@/components/TableList";
-import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
+import { useAppSelector } from "@/hook/useHookRedux";
 import { getAllPurchase } from "@/redux/api";
 import { DataTypePurchase } from "@/type";
 import { DeleteOutlined, EnvironmentOutlined } from "@ant-design/icons";
@@ -22,8 +22,8 @@ import { toast } from "react-toastify";
 import { useDebouncedCallback } from "use-debounce";
 
 const PurChase = () => {
-  const dispath = useAppDispatch();
   const user = useAppSelector((state) => state.auth.login.currentUser);
+  const axiosAuth = AxiosJWTInstance({ user });
 
   const [query, setQuery] = useState<string>("");
   const [page, setPage] = useState(1);
@@ -34,7 +34,7 @@ const PurChase = () => {
 
   const confirm: PopconfirmProps["onConfirm"] = async () => {
     try {
-      await AxiosJWTInstance({ user, dispath })({
+      await axiosAuth({
         method: "DELETE",
         url: `/purchase/${idDelete}`,
         headers: {
@@ -42,7 +42,7 @@ const PurChase = () => {
           Authorization: `Bearer ${user?.accessToken}`,
         },
       });
-      const purchase = await getAllPurchase({ user, dispath });
+      const purchase = await getAllPurchase({ user });
       setPurchase(purchase);
       toast.success("Delete purchase successfully!");
     } catch (e) {
@@ -186,7 +186,7 @@ const PurChase = () => {
 
   useEffect(() => {
     (async () => {
-      await AxiosJWTInstance({ user, dispath })({
+      await axiosAuth({
         method: "GET",
         url: `/purchase/admin?page=${page}&offset=10`,
         headers: {

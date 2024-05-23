@@ -1,6 +1,4 @@
-import AxiosJWTInstance from "@/InstanceAxios";
 import { Token } from "@/type";
-import axios from "axios";
 import { toast } from "react-toastify";
 import {
   logOutFailure,
@@ -10,10 +8,11 @@ import {
   signInStart,
   signInSuccess,
 } from "../slice/authSlice";
+import { axiosAuth } from "@/lib/axios";
 
 export async function getProduct() {
   try {
-    const res = await axios("/product", {
+    const res = await axiosAuth("/product", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -26,7 +25,7 @@ export async function getProduct() {
 }
 export async function getAllCategory() {
   try {
-    const res = await axios("/category", {
+    const res = await axiosAuth("/category", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -37,15 +36,9 @@ export async function getAllCategory() {
     console.log(err);
   }
 }
-export async function getAllPurchase({
-  user,
-  dispath,
-}: {
-  user: any;
-  dispath: any;
-}) {
+export async function getAllPurchase({ user }: { user: any }) {
   try {
-    const res = await AxiosJWTInstance({ user, dispath })("/purchase/admin", {
+    const res = await axiosAuth("/purchase/admin", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -58,7 +51,7 @@ export async function getAllPurchase({
   }
 }
 export async function getProductByName({ name }: { name: string }) {
-  return await axios(`/product/${name}`, {
+  return await axiosAuth(`/product/${name}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -66,34 +59,18 @@ export async function getProductByName({ name }: { name: string }) {
   }).then((data) => data);
 }
 export async function getCategoryByName({ name }: { name: string }) {
-  return await axios(`/category/${name}`, {
+  return await axiosAuth(`/category/${name}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   }).then((data) => data);
 }
-export async function getPurchaseById({
-  id,
-  user,
-  dispath,
-}: {
-  id: string;
-  user: any;
-  dispath: any;
-}) {
-  return await AxiosJWTInstance({ user, dispath })(`/purchase/${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${user?.accessToken}`,
-    },
-  }).then((data) => data);
-}
+
 export const signInUser = async (user: any, dispatch: any, navigate: any) => {
   dispatch(signInStart());
   try {
-    const res: any = await axios({
+    const res: any = await axiosAuth({
       method: "POST",
       data: user,
       url: "/login",
@@ -121,7 +98,7 @@ export const signInUser = async (user: any, dispatch: any, navigate: any) => {
 export const signOut = async (dispath: any, navigate: any, user: any) => {
   dispath(logOutStart());
   try {
-    await AxiosJWTInstance({ user, dispath })({
+    await axiosAuth({
       method: "POST",
       url: "/logout",
       headers: {
@@ -140,7 +117,7 @@ export const signOut = async (dispath: any, navigate: any, user: any) => {
 
 export const GetUserWithToken = async ({ token }: { token: Token }) => {
   try {
-    const res: any = await axios({
+    const res: any = await axiosAuth({
       method: "GET",
       url: "/user",
       headers: {
@@ -151,21 +128,4 @@ export const GetUserWithToken = async ({ token }: { token: Token }) => {
   } catch (e) {
     toast.error("Token not match!");
   }
-};
-
-export const getCategory = async ({
-  accessToken,
-  page = 1,
-  offset = 10,
-}: {
-  accessToken: string;
-  page?: number;
-  offset?: number;
-}) => {
-  return await axios(`/category?page=${page}&offset=${offset}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Berear ${accessToken}`,
-    },
-  }).then((data) => data);
 };

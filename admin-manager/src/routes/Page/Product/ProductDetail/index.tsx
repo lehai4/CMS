@@ -1,14 +1,8 @@
 import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
 import InfiniteScroll from "@/components/InfiniteScroller";
-import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
-import { AddToCart } from "@/redux/slice/cartSlice";
+import { useAppSelector } from "@/hook/useHookRedux";
 import { ProductProps } from "@/type";
-import {
-  HeartIcon,
-  MagnifyingGlassIcon,
-  ShoppingCartIcon,
-} from "@heroicons/react/24/outline";
 import { Divider, Image, Input, Select, Space, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -16,9 +10,8 @@ import { toast } from "react-toastify";
 import { useDebouncedCallback } from "use-debounce";
 const ProductDetail = () => {
   const user = useAppSelector((state) => state.auth.login.currentUser);
-  const cart = useAppSelector((state) => state.cart.cartArr);
-  const dispath = useAppDispatch();
 
+  const axiosAuth = AxiosJWTInstance({ user });
   const [query, setQuery] = useState<string>("");
   const [paginate, setPaginate] = useState<any>({
     value: "Show product per page",
@@ -29,7 +22,7 @@ const ProductDetail = () => {
   const [isHasMore, setIsHasMore] = useState<boolean>(true);
 
   const handleChangeInputSearch = useDebouncedCallback(async () => {
-    const res = await AxiosJWTInstance({ user, dispath })({
+    const res = await axiosAuth({
       method: "GET",
       url: `/product/?productName=${query}&page=1&offset=${
         paginate.value === "Show product per page" ? 6 : paginate
@@ -49,7 +42,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     (async () => {
-      await AxiosJWTInstance({ user, dispath })({
+      await axiosAuth({
         method: "GET",
         url: `/product${query ? `?productName=${query}&` : `?`}offset=${
           paginate.value === "Show product per page" ? 6 : paginate
@@ -72,7 +65,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     (async () => {
-      await AxiosJWTInstance({ user, dispath })({
+      await axiosAuth({
         method: "GET",
         url: `/product?page=${page}&offset=${
           paginate.value === "Show product per page" ? 6 : paginate
@@ -149,56 +142,9 @@ const ProductDetail = () => {
             {products.length > 0 ? (
               products.map((item, i) => (
                 <div
-                  className="item-card border border-[0.5] rounded-md px-[15px] relative"
+                  className="item-card border border-[0.5] rounded-md px-[15px] relative h-full"
                   key={i}
                 >
-                  <div className="hover:bg-[rgba(0,0,0,0.1)] hover:opacity-90 z-10 opacity-0 duration-200 ease-in transition-all w-full h-full absolute inset-0">
-                    <div className="flex flex-row items-center justify-center gap-2 absolute top-[50%] left-[50%] -translate-y-1/2 -translate-x-1/2 border border-gray rounded-lg bg-gray-100 p-[15px]">
-                      <button
-                        className="rounded-md p-2 bg-purple-700 border border-purple-700 hover:bg-sky-500 hover:border-sky-500 duration-200 ease-in transition-all"
-                        onClick={() => {
-                          toast.info("Temporary close function!");
-                        }}
-                      >
-                        <MagnifyingGlassIcon className="h-5 w-5 text-white" />
-                      </button>
-                      <button
-                        className="rounded-md p-2 bg-purple-700 border border-purple-700 hover:bg-sky-500 hover:border-sky-500 duration-200 ease-in transition-all"
-                        onClick={() => {
-                          if (cart.length > 0) {
-                            return cart.filter((c) => {
-                              if (c.id === item.id) {
-                                toast.error(
-                                  "product already exists in cart. Please select other product"
-                                );
-                              } else {
-                                dispath(
-                                  AddToCart({
-                                    ...item,
-                                    quantity: 1,
-                                  })
-                                );
-                                toast.success("Add Product Successfully!");
-                              }
-                            });
-                          } else if (cart.length === 0) {
-                            dispath(
-                              AddToCart({
-                                ...item,
-                                quantity: 1,
-                              })
-                            );
-                            toast.success("Add Product Successfully!");
-                          }
-                        }}
-                      >
-                        <ShoppingCartIcon className="h-5 w-5 text-white" />
-                      </button>
-                      <button className="rounded-md p-2 bg-purple-700 border border-purple-700 hover:bg-sky-500 hover:border-sky-500 duration-200 ease-in transition-all">
-                        <HeartIcon className="h-5 w-5 text-white" />
-                      </button>
-                    </div>
-                  </div>
                   <Link
                     to={`/product-detail/${item.urlName}`}
                     className="flex flex-col h-full"

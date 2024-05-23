@@ -1,6 +1,6 @@
 import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
-import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
+import { useAppSelector } from "@/hook/useHookRedux";
 import { getCategoryByName } from "@/redux/api";
 import { Category } from "@/type";
 import { ArrowLeftOutlined } from "@ant-design/icons";
@@ -21,13 +21,14 @@ type FieldType = {
 const EditCategory = () => {
   const params = useParams();
   const [form] = Form.useForm();
-  const dispath = useAppDispatch();
   const navigate = useNavigate();
-  const [category, setCategory] = useState<Category>();
   const user = useAppSelector((state) => state.auth.login.currentUser);
 
+  const axiosAuth = AxiosJWTInstance({ user });
+  const [category, setCategory] = useState<Category>();
+
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    const res = await AxiosJWTInstance({ user, dispath })({
+    const res = await axiosAuth({
       method: "PATCH",
       url: `/category/${category?.id}`,
       headers: {

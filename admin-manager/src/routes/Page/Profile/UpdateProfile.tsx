@@ -21,10 +21,13 @@ const UpdateProfile = () => {
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.login.currentUser);
   const role: any = user?.user?.role;
+
+  const axiosAuth = AxiosJWTInstance({ user });
+
   const [profile, setProfile] = useState<FieldType>();
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    await AxiosJWTInstance({ user, dispath })({
+    await axiosAuth({
       method: "PATCH",
       url: "/user",
       headers: {
@@ -57,7 +60,7 @@ const UpdateProfile = () => {
 
   useEffect(() => {
     (async function getProfileUser() {
-      await AxiosJWTInstance({ user, dispath })({
+      await axiosAuth({
         method: "GET",
         url: "/user",
         headers: {

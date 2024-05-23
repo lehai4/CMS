@@ -1,7 +1,6 @@
 import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
-import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
-import { getCategory } from "@/redux/api";
+import { useAppSelector } from "@/hook/useHookRedux";
 import { Category } from "@/type";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Select, type FormProps } from "antd";
@@ -18,10 +17,9 @@ type FieldType = {
 };
 
 const CreateProduct = () => {
-  const dispath = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.login.currentUser);
-
+  const axiosAuth = AxiosJWTInstance({ user });
   const [category, setCategory] = useState<Category[]>();
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
@@ -33,7 +31,7 @@ const CreateProduct = () => {
       discountPercentage: Number(values.discountPercentage),
       categories: [`${filter?.id}`],
     };
-    await AxiosJWTInstance({ user, dispath })({
+    await axiosAuth({
       url: `/product`,
       method: "POST",
       headers: {
@@ -51,18 +49,18 @@ const CreateProduct = () => {
   };
 
   useEffect(() => {
-    let mounted = true;
-    getCategory({
-      accessToken: user?.accessToken as string,
-      page: 1,
-      offset: 10,
-    }).then((items) => {
-      if (mounted) {
-        setCategory(items.data);
-      }
-    });
+    const getCategoryApi = async () => {
+      return await axiosAuth(`/category?page=1&offset=10`, {
+        method: "GET",
+        headers: {
+          Authorization: `Berear ${user?.accessToken}`,
+        },
+      }).then((data) => data);
+    };
     return () => {
-      mounted = false;
+      getCategoryApi().then((items) => {
+        setCategory(items.data);
+      });
     };
   }, []);
   return (

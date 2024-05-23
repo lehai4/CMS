@@ -1,20 +1,20 @@
 import AxiosJWTInstance from "@/InstanceAxios";
-import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
+import Helmet from "@/components/Helmet";
+import { useAppSelector } from "@/hook/useHookRedux";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Form, Input, type FormProps } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeftOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
-import Helmet from "@/components/Helmet";
 type FieldType = {
   name?: string;
 };
 const CreateCategory = () => {
-  const dispath = useAppDispatch();
   const navigate = useNavigate();
   const user = useAppSelector((state) => state.auth.login.currentUser);
 
+  const axiosAuth = AxiosJWTInstance({ user });
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    const res = await AxiosJWTInstance({ user, dispath })({
+    const res = await axiosAuth({
       url: `/category`,
       method: "POST",
       headers: {

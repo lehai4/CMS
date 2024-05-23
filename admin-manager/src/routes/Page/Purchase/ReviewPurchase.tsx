@@ -1,19 +1,21 @@
+import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
-import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
-import { getPurchaseById } from "@/redux/api";
+import { useAppSelector } from "@/hook/useHookRedux";
 import { Purchase } from "@/type";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ReviewPurchase = () => {
   const params = useParams();
   const [form] = Form.useForm();
-  const dispath = useAppDispatch();
-  const [purchase, setPurchase] = useState<Purchase>();
   const user = useAppSelector((state) => state.auth.login.currentUser);
-  console.log(params);
+  const axiosAuth = AxiosJWTInstance({ user });
+
+  const [purchase, setPurchase] = useState<Purchase>();
+
   const onFill = () => {
     form.setFieldsValue({
       ...purchase,
@@ -30,18 +32,24 @@ const ReviewPurchase = () => {
   useEffect(() => {
     onFill();
   }, [purchase]);
+
   useEffect(() => {
-    let mounted = true;
-    getPurchaseById({ id: params.id as string, user, dispath }).then(
-      (items) => {
-        if (mounted) {
-          setPurchase(items.data);
-        }
-      }
-    );
-    return () => {
-      mounted = false;
-    };
+    (async () => {
+      await axiosAuth({
+        method: "GET",
+        url: `/purchase/${params.id}`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.accessToken}`,
+        },
+      })
+        .then((response) => {
+          setPurchase(response.data);
+        })
+        .catch((error) => {
+          toast.error(error.message);
+        });
+    })();
   }, []);
   return (
     <div className="px-[40px] h-full flex flex-col items-center justify-center">
