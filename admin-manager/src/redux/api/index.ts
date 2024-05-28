@@ -95,10 +95,20 @@ export const signInUser = async (user: any, dispatch: any, navigate: any) => {
   }
 };
 
-export const signOut = async (dispath: any, navigate: any, user: any) => {
+export const signOut = async ({
+  dispath,
+  navigate,
+  axiosCustom,
+  user,
+}: {
+  dispath: any;
+  navigate: any;
+  axiosCustom: any;
+  user: any;
+}) => {
   dispath(logOutStart());
   try {
-    await axiosAuth({
+    await axiosCustom({
       method: "POST",
       url: "/logout",
       headers: {

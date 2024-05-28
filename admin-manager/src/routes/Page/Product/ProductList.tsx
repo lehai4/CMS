@@ -1,7 +1,7 @@
 import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
-import InfiniteScroll from "@/components/InfiniteScroller";
 import TableList from "@/components/TableList";
+import LinearLoading from "@/components/loading/linear";
 import { useAppSelector } from "@/hook/useHookRedux";
 import { getProduct } from "@/redux/api";
 import { DataType, ProductProps } from "@/type";
@@ -24,7 +24,6 @@ import { toast } from "react-toastify";
 import { useDebouncedCallback } from "use-debounce";
 const ProductList = () => {
   const user = useAppSelector((state) => state.auth.login.currentUser);
-  console.log(user);
   const axiosAuth = AxiosJWTInstance({ user });
 
   const [query, setQuery] = useState<string>("");
@@ -34,7 +33,8 @@ const ProductList = () => {
   const [idDelete, setIdDelete] = useState<string>("");
   const [fileReview, setFileReview] = useState<string>();
 
-  const [searchResults, setSearchResults] = useState<ProductProps[]>([]);
+  const [products, setProducts] = useState<ProductProps[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [isHasMore, setIsHasMore] = useState<boolean>(true);
   const [page, setPage] = useState(1);
 
@@ -49,7 +49,7 @@ const ProductList = () => {
         },
       });
       const product = await getProduct();
-      setSearchResults(product);
+      setProducts(product);
       toast.success("Delete successfully!");
     } catch (e) {
       toast.error("Delete Failed!");
@@ -155,7 +155,7 @@ const ProductList = () => {
     },
   ];
 
-  const dataSource: any[] = searchResults?.map((t) => {
+  const dataSource: any[] = products?.map((t) => {
     return {
       key: t.id,
       id: t.id,
@@ -191,7 +191,7 @@ const ProductList = () => {
           },
         })
           .then((response) => {
-            setSearchResults(response.data);
+            setProducts(response.data);
           })
           .catch((error) => {
             toast.error(error.message);
@@ -202,6 +202,14 @@ const ProductList = () => {
       });
   };
 
+  const onScroll = (e: any) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+
+    if (scrollTop + clientHeight === scrollHeight && isHasMore) {
+      setLoading(true);
+      setPage((prev) => prev + 1);
+    }
+  };
   const handleChangeInputSearch = useDebouncedCallback(async () => {
     const res = await axiosAuth({
       method: "GET",
@@ -211,16 +219,16 @@ const ProductList = () => {
       },
     });
     if (res.data.length > 0) {
-      setSearchResults(res.data);
+      setProducts(res.data);
       toast.info("results found!");
     } else {
-      setSearchResults([]);
+      setProducts([]);
       toast.info("No results found!");
     }
   }, 1000);
 
   useEffect(() => {
-    (async () => {
+    setTimeout(async () => {
       await axiosAuth({
         method: "GET",
         url: `/product?page=${page}&offset=10`,
@@ -231,20 +239,39 @@ const ProductList = () => {
         .then((response) => {
           response.data.length === 0
             ? setIsHasMore(false)
-            : setSearchResults([...searchResults, ...response.data]);
+            : setProducts([...products, ...response.data]);
+          setLoading(false);
+        })
+        .catch((error) => {
+          toast.error(error.message);
+        });
+    }, 3000);
+  }, [page]);
+
+  useEffect(() => {
+    (async () => {
+      await axiosAuth({
+        method: "GET",
+        url: `/product`,
+        headers: {
+          Authorization: `Bearer ${user?.accessToken}`,
+        },
+      })
+        .then((response) => {
+          setProducts(response.data);
         })
         .catch((error) => {
           toast.error(error.message);
         });
     })();
-  }, [page]);
+  }, []);
 
   return (
     <>
       <Helmet title="Product-list">
         <></>
       </Helmet>
-      <div className="py-[20px] px-[30px]">
+      <div className="py-[20px] px-[30px] h-[100%]">
         <h1 className="text-[32px] font-semibold">Product List</h1>
         <Space direction="horizontal" className="py-[20px] flex flex-row gap-5">
           <Space className="gap-5">
@@ -271,14 +298,12 @@ const ProductList = () => {
           </Space>
         </Space>
         <div className="py-[25px]">
-          <InfiniteScroll
-            loader={<p className="text-[16px]">Loading...</p>}
-            fetchMore={() => setPage((prev) => prev + 1)}
-            hasMore={isHasMore}
-            endMessage={<p>You have seen it all</p>}
-          >
-            <TableList columns={columns} dataSource={dataSource} />
-          </InfiniteScroll>
+          <TableList
+            columns={columns}
+            dataSource={dataSource}
+            handleScroll={onScroll}
+          />
+          {loading && <LinearLoading />}
         </div>
         <Modal
           title="Change Picture of product"

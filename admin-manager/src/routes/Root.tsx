@@ -1,4 +1,7 @@
+import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
+import { clearAllCart, deleteItemCart } from "@/redux/slice/cartSlice";
+import { ProductProps } from "@/type";
 import {
   BarsOutlined,
   CloseOutlined,
@@ -17,26 +20,24 @@ import {
   Button,
   Drawer,
   FloatButton,
+  Image,
   Layout,
   List,
   Popover,
-  Image,
   Space,
   Statistic,
+  Divider,
   Typography,
   theme,
 } from "antd";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { routerAdmin } from "../MockAPI";
 import Logo from "../components/Logo";
 import { ThemeContext } from "../hook/useContext";
 import { useAppDispatch, useAppSelector } from "../hook/useHookRedux";
 import { signOut } from "../redux/api";
-import { clearAllCart, deleteItemCart } from "@/redux/slice/cartSlice";
-import { ProductProps } from "@/type";
-import AxiosJWTInstance from "@/InstanceAxios";
-import { toast } from "react-toastify";
 const { Header, Content, Sider } = Layout;
 
 const RootDefault = () => {
@@ -46,6 +47,8 @@ const RootDefault = () => {
   const cartArr = useAppSelector((state) => state.cart.cartArr);
   const cartLength = useAppSelector((state) => state.cart.numberCart);
   const user = useAppSelector((state) => state.auth.login.currentUser);
+
+  const axiosAuth = AxiosJWTInstance({ user });
   const role: any = user?.user?.role;
 
   const [collapsed, setCollapsed] = useState(false);
@@ -63,7 +66,12 @@ const RootDefault = () => {
   };
 
   const handleLogOut = async () => {
-    await signOut(dispath, navigate, user);
+    await signOut({
+      dispath,
+      navigate,
+      axiosCustom: axiosAuth,
+      user,
+    });
   };
 
   const showMenu = () => {
@@ -99,7 +107,7 @@ const RootDefault = () => {
   }, [cartArr, cartLength]);
 
   const handlePayment = async () => {
-    await AxiosJWTInstance({ user, dispath })({
+    await axiosAuth({
       method: "POST",
       headers: {
         Authorization: `Bearer ${user?.accessToken}`,
@@ -140,8 +148,9 @@ const RootDefault = () => {
               }}
             >
               <div className="demo-logo-vertical" />
-              <div className="py-[4rem]">
+              <div className="mt-[24px]">
                 <Logo />
+                <Divider style={{ background: "white" }} />
               </div>
               <div className="flex flex-col gap-10 px-[18px]">
                 {routerAdmin.map((item, i) => (
@@ -165,7 +174,9 @@ const RootDefault = () => {
                 ))}
               </div>
             </Sider>
-            <Layout style={{ marginLeft: 300 }}>
+            <Layout
+              style={{ marginLeft: 300, height: "100vh", overflow: "hidden" }}
+            >
               <Header
                 style={{ padding: "0 30px", background: colorBgContainer }}
               >
@@ -201,13 +212,17 @@ const RootDefault = () => {
                     }
                     trigger="hover"
                   >
-                    <Button icon={<UserOutlined />}>
-                      Role: {user?.user?.role}
-                    </Button>
+                    <Button icon={<UserOutlined />}>{user?.user?.role}</Button>
                   </Popover>
                 </div>
               </Header>
-              <Content style={{ margin: "32px 32px", overflow: "initial" }}>
+              <Content
+                style={{
+                  margin: "32px 32px 24px 32px",
+                  overflow: "initial",
+                  height: "100%",
+                }}
+              >
                 <div
                   style={{
                     padding: 24,
@@ -224,7 +239,7 @@ const RootDefault = () => {
             trigger="click"
             type="primary"
             style={{ left: 24, bottom: 24 }}
-            icon={<SettingOutlined />}
+            icon={<SettingOutlined style={{ fontSize: 20 }} />}
           >
             <FloatButton
               onClick={() => {

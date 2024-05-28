@@ -77,36 +77,64 @@ const PurChase = () => {
       ),
     },
     {
-      title: "Amount",
+      title: () => {
+        return (
+          <div className="w-max">
+            <span>Amount</span>
+          </div>
+        );
+      },
       dataIndex: "amount",
       render: (amount: string) => (
         <Typography.Text className="text-[16px]">{amount}</Typography.Text>
       ),
+      width: "100px",
     },
     {
-      title: "TotalPrice",
+      title: () => {
+        return (
+          <div className="w-max">
+            <span>TotalPrice</span>
+          </div>
+        );
+      },
       dataIndex: "totalPrice",
       render: (totalPrice: string) => (
         <Typography.Text className="text-[16px]">{totalPrice}</Typography.Text>
       ),
+      width: "100px",
     },
     {
-      title: "ReviewNote",
+      title: () => {
+        return (
+          <div className="w-max">
+            <span>ReviewNote</span>
+          </div>
+        );
+      },
       dataIndex: "reviewNote",
       render: (reviewNote: string) => (
-        <Typography.Text className="text-[16px]">
+        <Typography.Text className="text-[16px] ">
           {reviewNote !== null ? reviewNote : "No review"}
         </Typography.Text>
       ),
+      width: "inherit",
     },
     {
-      title: "ReviewComment",
+      title: () => {
+        return (
+          <div className="w-max">
+            <span>ReviewComment</span>
+          </div>
+        );
+      },
       dataIndex: "reviewComment",
       render: (reviewComment: string) => (
         <Typography.Text className="text-[16px]">
           {reviewComment !== null ? reviewComment : "No Comment"}
         </Typography.Text>
       ),
+      width: "inherit",
     },
     {
       title: "Date Create",
@@ -228,11 +256,16 @@ const PurChase = () => {
                 }}
               />
             </form>
-            <Link to="create">
-              <Button type="primary" className="bg-blue-500" size="large">
-                Create Purchase
-              </Button>
-            </Link>
+            <Button
+              type="primary"
+              className="bg-blue-500"
+              size="large"
+              onClick={() => {
+                toast.info("function is not working");
+              }}
+            >
+              Create Purchase
+            </Button>
           </Space>
         </Space>
         <div className="py-[25px]">

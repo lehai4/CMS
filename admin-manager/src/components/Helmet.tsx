@@ -5,7 +5,7 @@ type HelmetProps = {
   children: React.ReactNode;
 };
 const Helmet = (props: HelmetProps): JSX.Element => {
-  document.title = "Mini Project - " + props.title;
+  document.title = "Admin Management - " + props.title;
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

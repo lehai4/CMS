@@ -1,7 +1,7 @@
 import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
-import InfiniteScroll from "@/components/InfiniteScroller";
 import TableList from "@/components/TableList";
+import LinearLoading from "@/components/loading/linear";
 import { useAppSelector } from "@/hook/useHookRedux";
 import { getAllCategory } from "@/redux/api";
 import { Category, DataTypeCategory } from "@/type";
@@ -29,7 +29,9 @@ const CategoryList = () => {
   const [page, setPage] = useState(1);
   const [idDelete, setIdDelete] = useState<string>("");
 
-  const [searchResults, setSearchResults] = useState<Category[]>([]);
+  const [category, setCategory] = useState<Category[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const [isHasMore, setIsHasMore] = useState<boolean>(true);
 
   const confirm: PopconfirmProps["onConfirm"] = async () => {
@@ -43,7 +45,7 @@ const CategoryList = () => {
         },
       });
       const category = await getAllCategory();
-      setSearchResults(category);
+      setCategory(category);
       toast.success("Delete successfully!");
     } catch (e) {
       toast.error("Delete Failed!");
@@ -103,13 +105,22 @@ const CategoryList = () => {
     },
   ];
 
-  const dataSource: any[] = searchResults?.map((t) => {
+  const dataSource: any[] = category?.map((t) => {
     return {
       key: t.id,
       id: t.id,
       name: t.name,
     };
   });
+
+  const onScroll = (e: any) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+
+    if (scrollTop + clientHeight === scrollHeight && isHasMore) {
+      setLoading(true);
+      setPage((prev) => prev + 1);
+    }
+  };
 
   const handleChangeInputSearch = useDebouncedCallback(async () => {
     const res = await axiosAuth({
@@ -121,17 +132,17 @@ const CategoryList = () => {
     });
     if (res.data.length > 0) {
       Array.isArray(res.data)
-        ? setSearchResults([...res.data])
-        : setSearchResults([{ id: res.data.id, name: res.data.name }]);
+        ? setCategory([...res.data])
+        : setCategory([{ id: res.data.id, name: res.data.name }]);
       toast.success("Search category is found");
     } else {
-      setSearchResults([]);
+      setCategory([]);
       toast.info("No results found!");
     }
   }, 1000);
 
   useEffect(() => {
-    (async () => {
+    setTimeout(async () => {
       await axiosAuth({
         method: "GET",
         url: `/category?page=${page}&offset=10`,
@@ -142,14 +153,32 @@ const CategoryList = () => {
         .then((response) => {
           response.data.length === 0
             ? setIsHasMore(false)
-            : setSearchResults([...searchResults, ...response.data]);
+            : setCategory([...category, ...response.data]);
+          setLoading(false);
+        })
+        .catch((error) => {
+          toast.error(error.message);
+        });
+    }, 3000);
+  }, [page]);
+
+  useEffect(() => {
+    (async () => {
+      await axiosAuth({
+        method: "GET",
+        url: `/category`,
+        headers: {
+          Authorization: `Bearer ${user?.accessToken}`,
+        },
+      })
+        .then((response) => {
+          setCategory(response.data);
         })
         .catch((error) => {
           toast.error(error.message);
         });
     })();
-  }, [page]);
-
+  }, []);
   return (
     <>
       <Helmet title="Category-list">
@@ -182,14 +211,12 @@ const CategoryList = () => {
           </Space>
         </Space>
         <div className="py-[25px]">
-          <InfiniteScroll
-            loader={<p className="text-[16px]">Loading...</p>}
-            fetchMore={() => setPage((prev) => prev + 1)}
-            hasMore={isHasMore}
-            endMessage={<p>You have seen it all</p>}
-          >
-            <TableList columns={columns} dataSource={dataSource} />
-          </InfiniteScroll>
+          <TableList
+            columns={columns}
+            dataSource={dataSource}
+            handleScroll={onScroll}
+          />
+          {loading && <LinearLoading />}
         </div>
       </div>
     </>

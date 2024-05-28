@@ -50,7 +50,7 @@ const CreateProduct = () => {
 
   useEffect(() => {
     const getCategoryApi = async () => {
-      return await axiosAuth(`/category?page=1&offset=10`, {
+      return await axiosAuth(`/category`, {
         method: "GET",
         headers: {
           Authorization: `Berear ${user?.accessToken}`,
@@ -144,6 +144,8 @@ const CreateProduct = () => {
           className="w-full"
         >
           <Select
+            mode="tags"
+            virtual={false}
             style={{ width: "100%" }}
             allowClear
             placeholder="Enter choose category"

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-
 const InfiniteScroll = ({
   children,
   loader,
@@ -15,7 +14,8 @@ const InfiniteScroll = ({
   endMessage: React.ReactElement;
   className?: string;
 }) => {
-  const pageEndRef = useRef(null);
+  const loaderRef = useRef(null);
+
   useEffect(() => {
     if (hasMore) {
       const observer = new IntersectionObserver(
@@ -26,14 +26,12 @@ const InfiniteScroll = ({
         },
         { threshold: 1 }
       );
-
-      if (pageEndRef.current) {
-        observer.observe(pageEndRef.current);
+      if (loaderRef.current) {
+        observer.observe(loaderRef.current);
       }
-
       return () => {
-        if (pageEndRef.current) {
-          observer.unobserve(pageEndRef.current);
+        if (loaderRef.current) {
+          observer.unobserve(loaderRef.current);
         }
       };
     }
@@ -42,7 +40,7 @@ const InfiniteScroll = ({
     <div className={className}>
       {children}
 
-      {hasMore ? <div ref={pageEndRef}>{loader}</div> : endMessage}
+      {hasMore ? <div ref={loaderRef}>{loader}</div> : endMessage}
     </div>
   );
 };
