@@ -94,6 +94,7 @@ const CategoryList = () => {
           >
             <Button
               danger
+              size="large"
               icon={<DeleteOutlined />}
               onClick={() => setIdDelete(e.id)}
             >

@@ -2,7 +2,7 @@ import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
 import { useAppDispatch, useAppSelector } from "@/hook/useHookRedux";
 import { signOut } from "@/redux/api";
-import { Button, Form, FormProps, Input, Space } from "antd";
+import { Button, Form, FormProps, Input, Space, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -38,7 +38,12 @@ const UpdateProfile = () => {
       .then(() => {
         toast.success("Update Profile successfully!");
         (async function LogOut() {
-          await signOut(dispath, navigate, user);
+          await signOut({
+            dispath,
+            navigate,
+            axiosCustom: axiosAuth,
+            user,
+          });
         })();
       })
       .catch((error) => {
@@ -59,21 +64,23 @@ const UpdateProfile = () => {
   }, [profile]);
 
   useEffect(() => {
-    (async function getProfileUser() {
-      await axiosAuth({
-        method: "GET",
-        url: "/user",
-        headers: {
-          Authorization: `Bearer ${user?.accessToken}`,
-        },
-      })
-        .then((response) => {
-          setProfile(response.data);
+    return () => {
+      (async function getProfileUser() {
+        await axiosAuth({
+          method: "GET",
+          url: "/user",
+          headers: {
+            Authorization: `Bearer ${user?.accessToken}`,
+          },
         })
-        .catch((error) => {
-          console.log(error);
-        });
-    })();
+          .then((response) => {
+            setProfile(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      })();
+    };
   }, []);
   return (
     <>
@@ -81,7 +88,7 @@ const UpdateProfile = () => {
         <></>
       </Helmet>
       <div
-        className={`py-[20px] ${role === "ADMIN" ? "px-[30px]" : "-mx-[15px]"}`}
+        className={`py-[20px] ${role === "ADMIN" ? "px-[30px]" : "mx-[35px]"}`}
       >
         <Space className=" py-[30px]">
           <Button
@@ -90,13 +97,13 @@ const UpdateProfile = () => {
             size="large"
             icon={<ArrowLeftOutlined />}
           >
-            Back Home
+            Back
           </Button>
         </Space>
         <div className="border rounded-md">
-          <h1 className="text-[32px] text-center font-semibold py-[20px]">
+          <Typography.Text className="text-[32px] text-center block font-semibold py-[20px]">
             Profile
-          </h1>
+          </Typography.Text>
           <div className="pt-[25px] pb-[40px] flex justify-center items-center">
             <Form
               labelCol={{ span: 8 }}

@@ -2,7 +2,7 @@ import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
 import { useAppSelector } from "@/hook/useHookRedux";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Space } from "antd";
+import { Button, Form, Input, Space, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -34,21 +34,23 @@ const Profile = () => {
   }, [profile]);
 
   useEffect(() => {
-    (async function getProfileUser() {
-      await axiosAuth({
-        method: "GET",
-        url: "/user",
-        headers: {
-          Authorization: `Bearer ${user?.accessToken}`,
-        },
-      })
-        .then((response) => {
-          setProfile(response.data);
+    return () => {
+      (async function getProfileUser() {
+        await axiosAuth({
+          method: "GET",
+          url: "/user",
+          headers: {
+            Authorization: `Bearer ${user?.accessToken}`,
+          },
         })
-        .catch((error) => {
-          console.log(error);
-        });
-    })();
+          .then((response) => {
+            setProfile(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      })();
+    };
   }, []);
   return (
     <>
@@ -56,7 +58,7 @@ const Profile = () => {
         <></>
       </Helmet>
       <div
-        className={`py-[20px] ${role === "ADMIN" ? "px-[30px]" : "-mx-[15px]"}`}
+        className={`py-[20px] ${role === "ADMIN" ? "px-[30px]" : "mx-[35px]"}`}
       >
         <Space className=" py-[30px]">
           <Button
@@ -65,13 +67,13 @@ const Profile = () => {
             size="large"
             icon={<ArrowLeftOutlined />}
           >
-            Back Home
+            Back
           </Button>
         </Space>
         <div className="border rounded-md">
-          <h1 className="text-[32px] text-center font-semibold py-[20px]">
+          <Typography.Text className="text-[32px] text-center block font-semibold py-[20px]">
             Profile
-          </h1>
+          </Typography.Text>
           <div className="pt-[25px] pb-[40px] flex justify-center">
             <Form
               labelCol={{ span: 8 }}

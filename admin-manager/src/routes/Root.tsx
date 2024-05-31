@@ -86,6 +86,10 @@ const RootDefault = () => {
     setOpen(false);
   };
 
+  const onChangeTheme = () => {
+    themeContext === "dark" ? setTheme("light") : setTheme("dark");
+  };
+
   const handleScroll = useCallback(
     (e: any) => {
       const window = e.currentTarget;
@@ -121,6 +125,10 @@ const RootDefault = () => {
     toast.success("Payment successfully!");
     dispath(clearAllCart());
   };
+
+  useEffect(() => {
+    localStorage.setItem("theme", themeContext);
+  }, [themeContext]);
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     return () => {
@@ -242,161 +250,184 @@ const RootDefault = () => {
             icon={<SettingOutlined style={{ fontSize: 20 }} />}
           >
             <FloatButton
-              onClick={() => {
-                themeContext === "dark" ? setTheme("light") : setTheme("dark");
-              }}
+              onClick={onChangeTheme}
               icon={
-                themeContext === "dark" ? <MoonOutlined /> : <SunOutlined />
+                themeContext === "dark" ? <SunOutlined /> : <MoonOutlined />
               }
             />
           </FloatButton.Group>
         </>
       ) : (
         <>
-          <div className="pb-[20px] px-[30px]">
-            <div className="container">
-              <div
-                className={`${!scroll ? "scroll_up" : "scroll_down"}${
-                  offsetScroll > 40
-                    ? " fixed top-0 left-0 right-0 z-10 bg-white border-b-[0.5px]"
-                    : ""
-                }`}
-              >
-                <div className="container">
-                  <div className="h-[80px] flex flex-row flex-wrap justify-between items-center gap-5">
-                    <h1 className="text-[25px] md:text-[25px] lg:text-[30px] xl:text-[32px] font-bold">
-                      Product Detail
-                    </h1>
-                    <div className="flex flex-row items-center gap-10"></div>
-                    <div className="hidden flex-row items-center gap-4 sm:hidden md:flex lg:flex xl:flex">
-                      <Popover
-                        trigger="hover"
-                        content={
-                          cartLength > 0 ? (
-                            <List>
-                              {cartArr.map((item, i) => (
-                                <List.Item
-                                  style={{ width: "350px" }}
-                                  actions={[
-                                    <Button
-                                      key="list-loadmore-edit"
-                                      onClick={() => handleDeleteItemCart(item)}
-                                    >
-                                      X
-                                    </Button>,
-                                  ]}
-                                  key={i}
-                                >
-                                  <List.Item.Meta
-                                    avatar={
-                                      <Image
-                                        src={`http://${item.picture}`}
-                                        preview={false}
-                                        width={100}
-                                        height={100}
-                                      />
-                                    }
-                                    title={
-                                      <Typography.Text
-                                        strong
-                                        className="text-base"
+          <Layout
+            hasSider
+            className="pb-[20px]"
+            style={{ flexDirection: "column" }}
+          >
+            <Header
+              style={{
+                width: "100%",
+                background:
+                  themeContext === "dark" ? "black" : colorBgContainer,
+              }}
+            >
+              <div className="container">
+                <div
+                  className={`bg-${
+                    themeContext === "dark" ? "black" : "white"
+                  } ${!scroll ? "scroll_up" : "scroll_down"}${
+                    offsetScroll > 40
+                      ? ` fixed top-0 left-0 right-0 z-10  border-b-[0.5px]`
+                      : ""
+                  }`}
+                >
+                  <div className="container">
+                    <div className="flex flex-row flex-wrap justify-between items-center gap-5">
+                      <Link to="/">
+                        <h1 className="text-[25px] md:text-[25px] lg:text-[30px] xl:text-[32px] font-bold">
+                          Product Detail
+                        </h1>
+                      </Link>
+                      <div className="flex flex-row items-center gap-10"></div>
+                      <div className="hidden flex-row items-center gap-4 sm:hidden md:flex lg:flex xl:flex">
+                        <Popover
+                          trigger="hover"
+                          content={
+                            cartLength > 0 ? (
+                              <List>
+                                {cartArr.map((item, i) => (
+                                  <List.Item
+                                    style={{ width: "350px" }}
+                                    actions={[
+                                      <Button
+                                        key="list-loadmore-edit"
+                                        onClick={() =>
+                                          handleDeleteItemCart(item)
+                                        }
                                       >
-                                        {item.name}
-                                      </Typography.Text>
-                                    }
-                                    description={
-                                      <Space direction="vertical">
-                                        <Typography.Text className="text-[14px]">
-                                          Quantity: {item.quantity}
+                                        X
+                                      </Button>,
+                                    ]}
+                                    key={i}
+                                  >
+                                    <List.Item.Meta
+                                      avatar={
+                                        <Image
+                                          src={`${
+                                            item.picture
+                                              ? `http://${item.picture}`
+                                              : "https://st4.depositphotos.com/2495409/19919/i/450/depositphotos_199193024-stock-photo-new-product-concept-illustration-isolated.jpg"
+                                          }`}
+                                          preview={false}
+                                          width={100}
+                                          height={100}
+                                        />
+                                      }
+                                      title={
+                                        <Typography.Text
+                                          strong
+                                          className="text-base"
+                                        >
+                                          {item.name}
                                         </Typography.Text>
-                                        <div className="flex flex-row items-center text-[16px] text-black">
-                                          Price: $
-                                          <Statistic
-                                            value={item.basePrice}
-                                            precision={2}
-                                            valueStyle={{ fontSize: 16 }}
-                                          />
-                                        </div>
-                                      </Space>
-                                    }
-                                  />
-                                </List.Item>
-                              ))}
-                              <Space
-                                direction="horizontal"
-                                className="flex flex-row justify-between mt-2"
-                              >
-                                <div className="flex flex-row items-center text-[16px] font-medium">
-                                  Overall Price: $
-                                  <Statistic
-                                    value={overallPrice()}
-                                    precision={2}
-                                    valueStyle={{ fontSize: 16 }}
-                                  />
-                                </div>
-                                <Button
-                                  danger
-                                  onClick={() => {
-                                    dispath(clearAllCart());
-                                  }}
+                                      }
+                                      description={
+                                        <Space direction="vertical">
+                                          <Typography.Text className="text-[14px]">
+                                            Quantity: {item.quantity}
+                                          </Typography.Text>
+                                          <Typography.Text className="flex flex-row items-center text-[16px]">
+                                            Price: $
+                                            <Statistic
+                                              value={item.basePrice}
+                                              precision={2}
+                                              valueStyle={{ fontSize: 16 }}
+                                            />
+                                          </Typography.Text>
+                                        </Space>
+                                      }
+                                    />
+                                  </List.Item>
+                                ))}
+                                <Space
+                                  direction="horizontal"
+                                  className="flex flex-row justify-between mt-2"
                                 >
-                                  Delete All
-                                </Button>
+                                  <div className="flex flex-row items-center text-[16px] font-medium">
+                                    Overall Price: $
+                                    <Statistic
+                                      value={overallPrice()}
+                                      precision={2}
+                                      valueStyle={{ fontSize: 16 }}
+                                    />
+                                  </div>
+                                  <Button
+                                    danger
+                                    onClick={() => {
+                                      dispath(clearAllCart());
+                                    }}
+                                  >
+                                    Delete All
+                                  </Button>
+                                  <Button
+                                    onClick={handlePayment}
+                                    type="primary"
+                                    className="bg-blue-500"
+                                  >
+                                    Payment
+                                  </Button>
+                                </Space>
+                              </List>
+                            ) : (
+                              <div>No any item in cart</div>
+                            )
+                          }
+                        >
+                          <Badge count={cartLength} showZero>
+                            <Button icon={<ShoppingCartOutlined />} />
+                          </Badge>
+                        </Popover>
+                        <Popover
+                          title="Tool"
+                          content={
+                            <Space>
+                              <Link to="/profile">
                                 <Button
-                                  onClick={handlePayment}
                                   type="primary"
-                                  className="bg-blue-500"
+                                  icon={<ProfileOutlined />}
                                 >
-                                  Payment
+                                  Profile
                                 </Button>
-                              </Space>
-                            </List>
-                          ) : (
-                            <div>No any item in cart</div>
-                          )
-                        }
-                      >
-                        <Badge count={cartLength} showZero>
-                          <Button icon={<ShoppingCartOutlined />} />
-                        </Badge>
-                      </Popover>
-                      <Popover
-                        title="Tool"
-                        content={
-                          <Space>
-                            <Link to="/profile">
-                              <Button type="primary" icon={<ProfileOutlined />}>
-                                Profile
+                              </Link>
+                              <Button
+                                type="default"
+                                icon={<LogoutOutlined />}
+                                onClick={handleLogOut}
+                              >
+                                LogOut
                               </Button>
-                            </Link>
-                            <Button
-                              type="default"
-                              icon={<LogoutOutlined />}
-                              onClick={handleLogOut}
-                            >
-                              LogOut
-                            </Button>
-                          </Space>
-                        }
-                        trigger="hover"
-                      >
-                        <Button icon={<UserOutlined />}>
-                          {user?.user?.name ? user?.user?.name : "Login"}
-                        </Button>
-                      </Popover>
+                            </Space>
+                          }
+                          trigger="hover"
+                        >
+                          <Button icon={<UserOutlined />}>
+                            {user?.user?.name ? user?.user?.name : "Login"}
+                          </Button>
+                        </Popover>
+                      </div>
+                      <BarsOutlined
+                        className="text-[30px] block sm:block md:hidden lg:hidden xl:hidden"
+                        onClick={showMenu}
+                      />
                     </div>
-                    <BarsOutlined
-                      className="text-[30px] block sm:block md:hidden lg:hidden xl:hidden"
-                      onClick={showMenu}
-                    />
                   </div>
                 </div>
               </div>
-            </div>
+            </Header>
             <div className={`${offsetScroll > 40 ? "mt-[80px]" : ""}`}>
               <Outlet />
             </div>
-          </div>
+          </Layout>
           <Drawer
             placement="right"
             onClose={onClose}
@@ -430,6 +461,19 @@ const RootDefault = () => {
               </Button>
             </div>
           </Drawer>
+          <FloatButton.Group
+            trigger="click"
+            type="primary"
+            style={{ left: 24, bottom: 24 }}
+            icon={<SettingOutlined style={{ fontSize: 20 }} />}
+          >
+            <FloatButton
+              onClick={onChangeTheme}
+              icon={
+                themeContext === "dark" ? <SunOutlined /> : <MoonOutlined />
+              }
+            />
+          </FloatButton.Group>
         </>
       )}
     </>

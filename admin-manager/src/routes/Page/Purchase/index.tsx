@@ -1,7 +1,6 @@
 import AxiosJWTInstance from "@/InstanceAxios";
 import Helmet from "@/components/Helmet";
-import InfiniteScroll from "@/components/InfiniteScroller";
-import TableList from "@/components/TableList";
+import LinearLoading from "@/components/loading/linear";
 import { useAppSelector } from "@/hook/useHookRedux";
 import { getAllPurchase } from "@/redux/api";
 import { DataTypePurchase } from "@/type";
@@ -12,6 +11,7 @@ import {
   Popconfirm,
   PopconfirmProps,
   Space,
+  Table,
   TableColumnsType,
   Typography,
   message,
@@ -30,6 +30,8 @@ const PurChase = () => {
 
   const [idDelete, setIdDelete] = useState<string>("");
   const [purchase, setPurchase] = useState<DataTypePurchase[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const [isHasMore, setIsHasMore] = useState<boolean>(true);
 
   const confirm: PopconfirmProps["onConfirm"] = async () => {
@@ -182,6 +184,7 @@ const PurChase = () => {
           >
             <Button
               danger
+              size="large"
               icon={<DeleteOutlined />}
               onClick={() => setIdDelete(e.id)}
             >
@@ -208,12 +211,22 @@ const PurChase = () => {
       product: t.product,
     };
   });
+
   const handleChangeInputSearch = useDebouncedCallback(async () => {
     toast.info("function is not working");
   }, 1000);
 
+  const onScroll = (e: any) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+
+    if (scrollTop + clientHeight === scrollHeight && isHasMore) {
+      setLoading(true);
+      setPage((prev) => prev + 1);
+    }
+  };
+
   useEffect(() => {
-    (async () => {
+    setTimeout(async () => {
       await axiosAuth({
         method: "GET",
         url: `/purchase/admin?page=${page}&offset=10`,
@@ -225,11 +238,12 @@ const PurChase = () => {
           response.data.length === 0
             ? setIsHasMore(false)
             : setPurchase([...purchase, ...response.data]);
+          setLoading(false);
         })
         .catch((error) => {
           toast.error(error.message);
         });
-    })();
+    }, 3000);
   }, [page]);
 
   return (
@@ -269,14 +283,15 @@ const PurChase = () => {
           </Space>
         </Space>
         <div className="py-[25px]">
-          <InfiniteScroll
-            loader={<p className="text-[16px]">Loading...</p>}
-            fetchMore={() => setPage((prev) => prev + 1)}
-            hasMore={isHasMore}
-            endMessage={<p>You have seen it all</p>}
-          >
-            <TableList columns={columns} dataSource={dataSource} />
-          </InfiniteScroll>
+          <Table
+            dataSource={dataSource}
+            columns={columns}
+            pagination={false}
+            scroll={{ x: "max-content" }}
+            className="shadow-lg rounded"
+            onScroll={onScroll}
+          />
+          {loading && <LinearLoading />}
         </div>
       </div>
     </>

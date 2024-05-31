@@ -1,3 +1,4 @@
+import ConfigProviderTheme from "@/components/config";
 import { SiderTheme } from "antd/es/layout/Sider";
 import { useState } from "react";
 import {
@@ -30,7 +31,9 @@ import {
 } from "./routes/importRoot";
 
 function App() {
-  const [themeContext, setTheme] = useState<SiderTheme>("light");
+  const [themeContext, setTheme] = useState<SiderTheme>(
+    localStorage.getItem("theme") as SiderTheme
+  );
   const user = useAppSelector((state) => state.auth.login.currentUser);
   const role: any = user?.user?.role;
   const routerAdmin = createBrowserRouter([
@@ -144,29 +147,31 @@ function App() {
       errorElement: <ErrorPage />,
     },
   ]);
+
   return (
-    <GlobalStyle>
-      <ToastContainer
-        position="top-center"
-        autoClose={2000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-      {/* Same as */}
-      <ThemeContext.Provider value={{ themeContext, setTheme }}>
-        {role === "ADMIN" ? (
-          <RouterProvider router={routerAdmin} />
-        ) : (
-          <RouterProvider router={routerUser} />
-        )}
-      </ThemeContext.Provider>
-    </GlobalStyle>
+    <ConfigProviderTheme config={themeContext}>
+      <GlobalStyle>
+        <ToastContainer
+          position="top-center"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
+        <ThemeContext.Provider value={{ themeContext, setTheme }}>
+          {role === "ADMIN" ? (
+            <RouterProvider router={routerAdmin} />
+          ) : (
+            <RouterProvider router={routerUser} />
+          )}
+        </ThemeContext.Provider>
+      </GlobalStyle>
+    </ConfigProviderTheme>
   );
 }
 

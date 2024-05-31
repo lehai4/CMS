@@ -37,6 +37,7 @@ const ProductDetailSlug = () => {
         quantity: quantity,
       })
     );
+    toast.success("Add Product to Cart sucessfully!");
   };
   useEffect(() => {
     let mounted = true;
@@ -82,9 +83,9 @@ const ProductDetailSlug = () => {
           </div>
           <div className="content px-[15px]">
             <div className="flex flex-col h-full justify-center pr-[40px]">
-              <h3 className="text-[30px] font-[700] my-[20px] tracking-wide">
+              <Typography.Text className="text-[30px] font-[700] my-[20px] tracking-wide">
                 {product?.name}
-              </h3>
+              </Typography.Text>
               <Space className="flex flex-row items-center my-[20px]">
                 <span className="text-[24px] font-[700] text-blue-700">$</span>
                 <Statistic

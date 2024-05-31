@@ -92,7 +92,7 @@ const ProductDetail = () => {
       <div className="container">
         <Space
           direction="horizontal"
-          className="pb-[40px] sm:py-[20px] md:py[20px] lg:py-[20px] xl:py-[20px] flex flex-row gap-5 -mx-[15px]"
+          className="pb-[40px] sm:py-[20px] md:py-[20px] lg:py-[20px] xl:py-[20px] flex flex-row gap-5 -mx-[15px]"
         >
           <Space className="flex-wrap">
             <form>
@@ -164,12 +164,12 @@ const ProductDetail = () => {
                     </div>
                     <div className="content px-[30px] py-[25px] flex-1 flex flex-col justify-end">
                       <div className="flex flex-row items-center justify-between my-[25px] gap-8">
-                        <h3 className="font-semibold text-[20px] sm:truncate lg:truncate">
+                        <Typography.Text className="font-semibold text-[20px] sm:truncate lg:truncate">
                           {item.name}
-                        </h3>
-                        <p className="font-semibold flex flex-row items-center text-[20px]">
+                        </Typography.Text>
+                        <Typography.Text className="font-semibold flex flex-row items-center text-[20px]">
                           $ <span>{item.basePrice}</span>
-                        </p>
+                        </Typography.Text>
                       </div>
                       <Typography.Paragraph
                         className="text-[20px] font-[400] text-gray-500"
