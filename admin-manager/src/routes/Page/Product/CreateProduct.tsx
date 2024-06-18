@@ -144,7 +144,6 @@ const CreateProduct = () => {
           className="w-full"
         >
           <Select
-            mode="tags"
             virtual={false}
             style={{ width: "100%" }}
             allowClear
@@ -163,7 +162,6 @@ const CreateProduct = () => {
           name="description"
           rules={[
             { required: true },
-
             { message: "Please input your description!" },
           ]}
         >

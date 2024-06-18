@@ -18,7 +18,7 @@ import {
   Typography,
   message,
 } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDebouncedCallback } from "use-debounce";
@@ -26,8 +26,9 @@ const ProductList = () => {
   const user = useAppSelector((state) => state.auth.login.currentUser);
   const axiosAuth = AxiosJWTInstance({ user });
 
+  const inputFile = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState<string>("");
-  const [file, setFile] = useState<any>();
+  const [image, setImage] = useState(null);
   const [id, setId] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
   const [idDelete, setIdDelete] = useState<string>("");
@@ -168,13 +169,38 @@ const ProductList = () => {
     };
   });
 
+  const handleChangeImage = (event: any) => {
+    const file = event.target.files[0];
+    if (file.size > 3 * 1024 * 1024) {
+      alert("Kích thước ảnh vượt quá 3MB.");
+      return;
+    } else {
+      const Blob = URL.createObjectURL(file);
+      setFileReview(Blob);
+      setImage(file);
+    }
+  };
+
   const onUpload = async () => {
+    if (!image) {
+      toast.error("Please choose image for upload");
+      return;
+    }
+
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", image);
+
+    setFileReview(undefined);
+    if (inputFile.current) {
+      (inputFile.current as any).value = "";
+      (inputFile.current as any).type = "text";
+      (inputFile.current as any).type = "file";
+    }
     await axiosAuth({
       url: `/product/picture/${id}`,
       method: "PATCH",
       headers: {
+        "Content-type": "application/x-www-form-urlencoded",
         Authorization: `Bearer ${user?.accessToken}`,
       },
       data: formData,
@@ -315,16 +341,11 @@ const ProductList = () => {
             setModalOpen(false);
           }}
         >
-          <Input
+          <input
+            accept="image/*"
             type="file"
-            onChange={(e) => {
-              const FileList: any = e.target.files;
-              if (FileList) {
-                const Blob = URL.createObjectURL(FileList[0]);
-                setFileReview(Blob);
-                setFile(FileList[0]);
-              }
-            }}
+            ref={inputFile}
+            onChange={handleChangeImage}
           />
           {fileReview && <img src={fileReview} />}
         </Modal>
