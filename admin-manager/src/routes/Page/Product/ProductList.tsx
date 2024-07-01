@@ -28,11 +28,10 @@ const ProductList = () => {
 
   const inputFile = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState<string>("");
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState<any>(null);
   const [id, setId] = useState<string>("");
   const [modalOpen, setModalOpen] = useState(false);
   const [idDelete, setIdDelete] = useState<string>("");
-  const [fileReview, setFileReview] = useState<string>();
 
   const [products, setProducts] = useState<ProductProps[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -64,7 +63,6 @@ const ProductList = () => {
   const columns: TableColumnsType<DataType> = [
     {
       title: "Picture",
-      dataIndex: "",
       render: (e: DataType) => (
         <Image
           src={
@@ -73,13 +71,14 @@ const ProductList = () => {
               : "https://st4.depositphotos.com/2495409/19919/i/450/depositphotos_199193024-stock-photo-new-product-concept-illustration-isolated.jpg"
           }
           alt="picture"
-          width={100}
-          height={100}
+          width={60}
+          height={60}
           preview={false}
           onClick={() => {
             setModalOpen(true);
             setId(e.id);
           }}
+          className="w-[60px] h-[60px]"
         />
       ),
     },
@@ -170,13 +169,11 @@ const ProductList = () => {
   });
 
   const handleChangeImage = (event: any) => {
-    const file = event.target.files[0];
+    const file = event.target.files?.[0];
     if (file.size > 3 * 1024 * 1024) {
       alert("Kích thước ảnh vượt quá 3MB.");
       return;
     } else {
-      const Blob = URL.createObjectURL(file);
-      setFileReview(Blob);
       setImage(file);
     }
   };
@@ -190,12 +187,6 @@ const ProductList = () => {
     const formData = new FormData();
     formData.append("file", image);
 
-    setFileReview(undefined);
-    if (inputFile.current) {
-      (inputFile.current as any).value = "";
-      (inputFile.current as any).type = "text";
-      (inputFile.current as any).type = "file";
-    }
     await axiosAuth({
       url: `/product/picture/${id}`,
       method: "PATCH",
@@ -207,7 +198,6 @@ const ProductList = () => {
     })
       .then(async () => {
         setModalOpen(false);
-        setFileReview("");
         toast.success("Change image successfully");
         await axiosAuth({
           method: "GET",
@@ -226,6 +216,10 @@ const ProductList = () => {
       .catch((error) => {
         toast.error(error.message);
       });
+    if (inputFile.current) {
+      inputFile.current.value = "";
+    }
+    setImage(null);
   };
 
   const onScroll = (e: any) => {
@@ -236,6 +230,7 @@ const ProductList = () => {
       setPage((prev) => prev + 1);
     }
   };
+
   const handleChangeInputSearch = useDebouncedCallback(async () => {
     const res = await axiosAuth({
       method: "GET",
@@ -338,16 +333,48 @@ const ProductList = () => {
           okText="Upload"
           onOk={onUpload}
           onCancel={() => {
+            if (inputFile.current) {
+              inputFile.current.value = "";
+            }
+            setImage(null);
             setModalOpen(false);
           }}
         >
-          <input
-            accept="image/*"
-            type="file"
-            ref={inputFile}
-            onChange={handleChangeImage}
-          />
-          {fileReview && <img src={fileReview} />}
+          <Space direction="vertical">
+            <input
+              accept="image/*"
+              onClick={() => {
+                if (inputFile.current) {
+                  inputFile.current.value = "";
+                }
+              }}
+              type="file"
+              ref={inputFile}
+              onChange={handleChangeImage}
+            />
+            <Space direction="vertical" className="mt-[20px]">
+              {image && (
+                <>
+                  <Image
+                    src={URL.createObjectURL(image)}
+                    width={"100%"}
+                    height={"100%"}
+                  />
+                  <Button
+                    onClick={() => {
+                      setImage(null);
+                      if (inputFile.current) {
+                        inputFile.current.value = "";
+                      }
+                    }}
+                    danger
+                  >
+                    Delete Image
+                  </Button>
+                </>
+              )}
+            </Space>
+          </Space>
         </Modal>
       </div>
     </>

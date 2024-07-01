@@ -267,15 +267,14 @@ const RootDefault = () => {
             <Header
               style={{
                 width: "100%",
-                background:
-                  themeContext === "dark" ? "black" : colorBgContainer,
+                background: colorBgContainer,
               }}
             >
               <div className="container">
                 <div
-                  className={`bg-${
-                    themeContext === "dark" ? "black" : "white"
-                  } ${!scroll ? "scroll_up" : "scroll_down"}${
+                  className={`bg-white ${
+                    !scroll ? "scroll_up" : "scroll_down"
+                  }${
                     offsetScroll > 40
                       ? ` fixed top-0 left-0 right-0 z-10  border-b-[0.5px]`
                       : ""
@@ -461,19 +460,6 @@ const RootDefault = () => {
               </Button>
             </div>
           </Drawer>
-          <FloatButton.Group
-            trigger="click"
-            type="primary"
-            style={{ left: 24, bottom: 24 }}
-            icon={<SettingOutlined style={{ fontSize: 20 }} />}
-          >
-            <FloatButton
-              onClick={onChangeTheme}
-              icon={
-                themeContext === "dark" ? <SunOutlined /> : <MoonOutlined />
-              }
-            />
-          </FloatButton.Group>
         </>
       )}
     </>

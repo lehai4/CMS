@@ -5,8 +5,13 @@ import Register from "./Register/Register";
 
 const AuthForm = () => {
   const path = useLocation();
+  const theme = localStorage.getItem("theme");
   return (
-    <Wrapper className="authenform bg-gray-100">
+    <Wrapper
+      className={`authenform ${
+        theme === "light" ? "bg-gray-100" : "bg-gray-600"
+      }`}
+    >
       {path.pathname === "/auth/login" ? (
         <Login />
       ) : path.pathname === "/auth/register" ? (

@@ -149,7 +149,7 @@ function App() {
   ]);
 
   return (
-    <ConfigProviderTheme config={themeContext}>
+    <ConfigProviderTheme config={themeContext} role={role}>
       <GlobalStyle>
         <ToastContainer
           position="top-center"

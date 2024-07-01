@@ -1,6 +1,6 @@
+import imgAuthen from "@/assets/image/authentication.png";
 import Helmet from "@/components/Helmet";
 import Wrapper from "@/components/Wrapper";
-import imgAuthen from "@/assets/image/authentication.png";
 import AuthForm from "./AuthForm";
 
 const Authentication = () => {
@@ -16,10 +16,10 @@ const Authentication = () => {
         </Wrapper>
         <Wrapper className="authentication-content flex justify-center flex-col">
           <h3 className="text-[35px] text-green-500 italic font-semibold">
-            Hệ thống
+            System
           </h3>
           <h2 className="text-[50px] text-orange-500 italic font-bold">
-            Quản lý
+            Management
           </h2>
         </Wrapper>
       </div>

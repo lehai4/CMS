@@ -51,34 +51,6 @@ export const cartSlice = createSlice({
         (item) => item.id !== action.payload.id
       );
     },
-    // decreaseQuantity: (
-    //   state,
-    //   action: PayloadAction<{
-    //     id: string;
-    //     quantity: number;
-    //   }>
-    // ) => {
-    //   state.cartArr.map((item) => {
-    //     if (item.id === action.payload.id) {
-    //       item.quantity = action.payload.quantity;
-    //       item.total = action.payload.quantity * item.price;
-    //     }
-    //   });
-    // },
-    // increaseQuantity: (
-    //   state,
-    //   action: PayloadAction<{
-    //     id: string;
-    //     quantity: number;
-    //   }>
-    // ) => {
-    //   state.cartArr.map((item) => {
-    //     if (item.id === action.payload.id) {
-    //         item.quantity = action.payload.quantity;
-    //         item.total = action.payload.quantity * item.price;
-    //     }
-    //   });
-    // },
   },
 });
 
@@ -88,8 +60,6 @@ export const {
   deleteItemCart,
   getCart,
   clearAllCart,
-  //   decreaseQuantity,
-  //   increaseQuantity,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
