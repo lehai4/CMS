@@ -18,14 +18,13 @@ const Register = () => {
   const [form] = Form.useForm();
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    console.log(values);
     await axios({ method: "POST", url: "/user", data: values })
       .then(() => {
         toast.success("Register successfully!");
         navigate("/auth/login");
       })
       .catch((error) => {
-        toast.error(error.message);
+        toast.error(error.response.data.message);
       });
   };
 
