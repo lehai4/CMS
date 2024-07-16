@@ -248,7 +248,7 @@ const PurChase = () => {
 
   return (
     <>
-      <Helmet title="Category-list">
+      <Helmet title="PurchaseList">
         <></>
       </Helmet>
       <div className="py-[20px] px-[30px]">

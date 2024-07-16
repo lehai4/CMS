@@ -140,7 +140,7 @@ const RootDefault = () => {
     <>
       {role === "ADMIN" ? (
         <>
-          <Helmet title="Main">
+          <Helmet title="Home">
             <></>
           </Helmet>
           <Layout hasSider>

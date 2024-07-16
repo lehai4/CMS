@@ -65,7 +65,7 @@ const EditCategory = () => {
 
   return (
     <div className="px-[40px] h-full flex flex-col items-center justify-center">
-      <Helmet title="Edit-category">
+      <Helmet title="EditCategory">
         <></>
       </Helmet>
       <div className="w-full flex flex-row items-center justify-between py-[20px]">

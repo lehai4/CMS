@@ -53,7 +53,7 @@ const ReviewPurchase = () => {
   }, []);
   return (
     <div className="px-[40px] h-full flex flex-col items-center justify-center">
-      <Helmet title="Review Purchase">
+      <Helmet title="ReviewPurchase">
         <></>
       </Helmet>
       <div className="w-full flex flex-row items-center justify-between py-[20px]">

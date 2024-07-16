@@ -78,7 +78,7 @@ const EditProduct = () => {
 
   return (
     <div className="px-[40px] h-full flex flex-col items-center justify-center">
-      <Helmet title="Edit-product">
+      <Helmet title="EditProduct">
         <></>
       </Helmet>
       <div className="w-full flex flex-row items-center justify-between py-[20px]">

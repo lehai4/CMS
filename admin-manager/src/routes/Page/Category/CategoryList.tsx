@@ -182,7 +182,7 @@ const CategoryList = () => {
   }, []);
   return (
     <>
-      <Helmet title="Category-list">
+      <Helmet title="CategoryList">
         <></>
       </Helmet>
       <div className="py-[20px] px-[30px]">

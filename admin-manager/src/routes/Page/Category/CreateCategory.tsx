@@ -32,7 +32,7 @@ const CreateCategory = () => {
 
   return (
     <div className="h-full flex flex-col items-center justify-center">
-      <Helmet title="Create-category">
+      <Helmet title="CreateCategory">
         <></>
       </Helmet>
       <div className="w-full flex flex-row items-center justify-between py-[20px]">

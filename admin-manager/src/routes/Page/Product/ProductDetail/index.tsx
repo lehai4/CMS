@@ -86,7 +86,7 @@ const ProductDetail = () => {
   }, [page]);
   return (
     <div className="py-[20px] px-[30px]">
-      <Helmet title="product-detail">
+      <Helmet title="ProductDetail">
         <></>
       </Helmet>
       <div className="container">

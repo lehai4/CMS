@@ -289,7 +289,7 @@ const ProductList = () => {
 
   return (
     <>
-      <Helmet title="Product-list">
+      <Helmet title="ProductList">
         <></>
       </Helmet>
       <div className="py-[20px] px-[30px] h-[100%]">

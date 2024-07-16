@@ -52,7 +52,7 @@ const ProductDetailSlug = () => {
   }, []);
   return (
     <div className="container h-full">
-      <Helmet title={`product-detail-${product?.name}`}>
+      <Helmet title={`ProductDetail-${product?.name}`}>
         <div></div>
       </Helmet>
 
