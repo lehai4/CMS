@@ -14,20 +14,21 @@ const CreateCategory = () => {
 
   const axiosAuth = AxiosJWTInstance({ user });
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    const res = await axiosAuth({
+    await axiosAuth({
       url: `/category`,
       method: "POST",
       headers: {
         Authorization: `Bearer ${user?.accessToken}`,
       },
       data: values,
-    });
-    if (res.data) {
-      toast.success("Create Category successfully!");
-      navigate("/category");
-    } else {
-      toast.error("Create Category failed");
-    }
+    })
+      .then(() => {
+        toast.success("Create Category successfully!");
+        navigate("/category");
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message);
+      });
   };
 
   return (

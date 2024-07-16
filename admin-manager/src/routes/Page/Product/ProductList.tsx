@@ -47,10 +47,15 @@ const ProductList = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user?.accessToken}`,
         },
-      });
-      const product = await getProduct();
-      setProducts(product);
-      toast.success("Delete successfully!");
+      })
+        .then(async () => {
+          const product = await getProduct();
+          setProducts(product);
+          toast.success("Delete successfully!");
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        });
     } catch (e) {
       toast.error("Delete Failed!");
     }
